@@ -1,0 +1,29 @@
+{
+    "MetricDataQueries": [
+        {
+            "Id": "test123",
+            "MetricStat": {
+                "Metric": {
+                    "Namespace": "AWS/Connect",
+                    "MetricName": "CallsPerInterval",
+                    "Dimensions": [
+                        {
+                            "Name": "InstanceId",
+                            "Value": "4ddb74f2-26b0-4e4e-9a79-50f5b5f02e4c"
+                        },
+                        {
+                            "Name": "MetricGroup",
+                            "Value": "VoiceCalls"
+                        }
+                    ]
+                },
+                "Period": 3600,
+                "Stat": "Sum"
+            },
+            "Label": "myRequestLabel",
+            "ReturnData": true
+        }
+    ],
+    "StartTime": "2020-04-01T06:00:0000",
+    "EndTime": "2020-04-07T23:59:0000"
+}
