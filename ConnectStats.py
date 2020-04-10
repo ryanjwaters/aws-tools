@@ -73,14 +73,17 @@ def lambda_handler(event, context):
         now = datetime.now()
         print ("Current time \t\t" +now.strftime("%Y-%m-%dT%H:%M:%S"))
 
+        # Start time for query
         start = datetime.combine(date.today(), datetime.min.time())
-        startTime = start.strftime("%Y-%m-01T%H:00:00")
+        startTime = start.strftime("%Y-%m-%dT%H:00:00")
         print("Query start time: \t" +startTime + " UTC")
 
+        # End time for query
         nowUTC = convert_timezone_utc(now)
         endTime = nowUTC.strftime("%Y-%m-%dT%H:00:00")
         print("Query end time: \t" +endTime + " UTC\n")
 
+        # Cloudwatch query
         response = cw.get_metric_data(
             MetricDataQueries = [
                 add_connect_metric_query(connect_id, "totalCalls", "CallsPerInterval", "Sum"),
@@ -90,11 +93,13 @@ def lambda_handler(event, context):
             EndTime=endTime
         )
 
+        # Setup files to write responses
         now = datetime.now()
         out_prefix = now.strftime("%Y-%m-%dT%H")
         file_path_concurrentcalls = os.path.join(tmpdir, out_prefix+ "-concurrentCalls.txt")
         file_path_totalcalls = os.path.join(tmpdir, out_prefix+ "-totalCalls.txt")
 
+        # Parse responses and write to files
         metricDataResults = response['MetricDataResults']
         for metricDataResult in metricDataResults:
             id = metricDataResult['Id']
@@ -115,6 +120,7 @@ def lambda_handler(event, context):
         f = open(file_path_totalcalls, "r")
         message += f.read()
 
+        # Print message to console
         print(message)
 
         # Upload to S3 is a bucket was provided
@@ -126,3 +132,6 @@ def lambda_handler(event, context):
         if sns_topic is not None:
             sns = boto3.client('sns')
             sns.publish(Message=message, TopicArn=sns_topic)
+
+        # Return respone (ie- for APIGW)
+        # return { "msg" : message }
