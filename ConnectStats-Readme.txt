@@ -6,8 +6,8 @@ Option1: Lambda on AWS
 - Create a lambda function
 - Add two environment variables:
     'CONNECT_ID'     : "4ddb74f2-26b0-4e4e-9a79-50f5b5f02e4c",
-    'S3_DEST_BUCKET' : "ryanjohnwaterstest"
-
+    'S3_DEST_BUCKET' : "ryanjohnwaterstest",
+    'SNS_TOPIC' : "arn:aws:sns:us-east-1:396696610383:ALARM_TEST_TOPIC"
 
 Option 2: Run from Client
 - Install python3 and boto3
@@ -15,7 +15,8 @@ Option 2: Run from Client
 
 event = {
     'CONNECT_ID' : "4ddb74f2-26b0-4e4e-9a79-50f5b5f02e4c",
-    'S3_DEST_BUCKET' : "ryanjohnwaterstest"
+    'S3_DEST_BUCKET' : "ryanjohnwaterstest",
+    'SNS_TOPIC' : "arn:aws:sns:us-east-1:396696610383:ALARM_TEST_TOPIC"
 }
 lambda_handler(event, {})
 

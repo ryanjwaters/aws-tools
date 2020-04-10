@@ -1,5 +1,6 @@
 import os
 import tempfile
+import json
 import boto3
 import logging
 import sys
@@ -53,22 +54,21 @@ def convert_timezone_utc(dateAndTime):
     dateAndTime = dateAndTime.replace(tzinfo=from_zone)
     return dateAndTime.astimezone(to_zone)
 
-def print_console(file_path):
-    contents = open(file_path, "r")
-    for line in contents:
-        print(line)
-
 def get_value(event, key):
     try:
         return os.environ[key]  # Lambda environment variable
     except:
-        return event[key]
+        try :
+            return event[key] # Event variable
+        except:
+            return None
 
 def lambda_handler(event, context):
 
     with tempfile.TemporaryDirectory() as tmpdir:
         connect_id = get_value(event, "CONNECT_ID")
         s3_dest_bucket = get_value(event, "S3_DEST_BUCKET")
+        sns_topic = get_value(event, "SNS_TOPIC")
 
         now = datetime.now()
         print ("Current time \t\t" +now.strftime("%Y-%m-%dT%H:%M:%S"))
@@ -106,12 +106,23 @@ def lambda_handler(event, context):
                 f = open(file_path_totalcalls, "w+")
                 write_result_file(f, metricDataResult)
 
-        # Print to console
-        print("Concurrent calls:\n")
-        print_console(file_path_concurrentcalls)
-        print("Total calls:\n")
-        print_console(file_path_concurrentcalls)
+        # Build up a message
+        message = "Concurrent calls (Maximum)\n"
+        f = open(file_path_concurrentcalls, "r")
+        message += f.read()
 
-        # Upload to S3
-        s3.upload_file(file_path_concurrentcalls, s3_dest_bucket, "concurrentCalls.txt")
-        s3.upload_file(file_path_totalcalls, s3_dest_bucket, "totalCalls.txt")
+        message += "\nTotal calls\n"
+        f = open(file_path_totalcalls, "r")
+        message += f.read()
+
+        print(message)
+
+        # Upload to S3 is a bucket was provided
+        if s3_dest_bucket is not None:
+            s3.upload_file(file_path_concurrentcalls, s3_dest_bucket, "concurrentCalls.txt")
+            s3.upload_file(file_path_totalcalls, s3_dest_bucket, "totalCalls.txt")
+
+        # Send to SNS topic if one was provided (Setup SNS to send email, text, etc)
+        if sns_topic is not None:
+            sns = boto3.client('sns')
+            sns.publish(Message=message, TopicArn=sns_topic)
