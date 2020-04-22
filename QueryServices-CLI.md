@@ -1,6 +1,6 @@
 # aws-tools
 
-# You can use SMS to query services available in a particula region, and then also to get human readable service name and AWS marketing URL
+# You can use SMS to query services available in a particula region
 
 - Query services supported in a particular region (ie-"ca-central-1") 
 ```aws ssm get-parameters-by-path --path /aws/service/global-infrastructure/regions/ca-central-1/services --output json | jq .Parameters[].Name | sort```
