@@ -58,14 +58,16 @@ def lambda_handler(event, context):
             break
 
     i = 1;
-    results.sort()
-    for service in results:
-        print("{}. {}".format(i, service['Name']))
-        print("\t{}".format(service['longName']))
- 
-        if 'marketingHomeURL' in service:
-            print("\t{}".format(service['marketingHomeURL']))
+    results.sort(key=lambda x: x['longName'], reverse=False)
 
+    for service in results:
+        myURL=''
+        if 'marketingHomeURL' in service:
+            myURL = format(service['marketingHomeURL'])
+
+        row = "{:>4}.{:<60}{:<60}"  # build formatter string
+        print(row.format(i, service['longName'], myURL))
+ 
         i+=1
 
     return results
