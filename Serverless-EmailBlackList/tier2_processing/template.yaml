@@ -1,0 +1,104 @@
+Parameters:
+  Stage:
+    Type: String
+
+  MyQueueEmailArn:
+    Type: String
+    MinLength: 1
+
+  MyQueueEmailBounceArn:
+    Type: String
+    MinLength: 1
+
+  MyCustomResourceTestArn:
+    Type: String
+    MinLength: 1  
+  
+  MyDBTableName:
+    Type: String
+    MinLength: 1
+
+Resources:
+
+  MyLambdaEmail:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: email.handler
+      Runtime: python3.7
+      Role: !GetAtt MyLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          databaseName: !Ref MyDBTableName
+
+  MyLambdaEmailBounce:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: emailBounce.handler
+      Runtime: python3.7
+      Role: !GetAtt MyLambdaExecutionRole.Arn
+      Environment:
+        Variables:
+          databaseName: !Ref MyDBTableName
+          
+  MyCustomResourceTest:
+    Type: "Custom::Test"
+    Properties:
+      #ServiceToken: "arn:aws:lambda:us-east-1:396696610383:function:lambda_customResourceTest"
+      ServiceToken: !Ref MyCustomResourceTestArn
+      ec2TagName: "RyanTest"
+
+  ########################################################################################## 
+  # Lambda Execution Role
+
+  MyLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      # Who can assume this role (lambda can)
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - 'sts:AssumeRole'
+            Principal:
+              Service: 
+                - lambda.amazonaws.com
+
+      # Execution permissions: AWS Managed policies
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
+        - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
+
+      # Execution permissions: Inline policy
+      Policies:
+        - PolicyName: my-policy-test
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action: 
+                  - 'logs:*'
+                Resource: 'arn:aws:logs:*:*:*'
+  
+  ##########################################################################################
+  # Lambda 'event source mapping' to connect the SQS queues to the lambda functions
+
+  MyEventSourceMappingEmail:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties: 
+      EventSourceArn: 
+        !Ref MyQueueEmailArn
+      FunctionName:
+        Fn::GetAtt:
+          - MyLambdaEmail
+          - Arn
+
+  MyEventSourceMappingEmailBounce:
+    Type: AWS::Lambda::EventSourceMapping
+    Properties: 
+      EventSourceArn: 
+        !Ref MyQueueEmailBounceArn
+      FunctionName:
+        Fn::GetAtt:
+          - MyLambdaEmailBounce
+          - Arn

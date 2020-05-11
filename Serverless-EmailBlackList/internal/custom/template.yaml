@@ -1,0 +1,35 @@
+Parameters:
+  Stage:
+    Type: String
+
+Resources:
+  
+  MyLambdaCustomResourceTest:
+    Type: AWS::Lambda::Function
+    Properties:
+      Handler: customResourceTest.handler
+      Runtime: python3.7
+      Role: !GetAtt MyCustomLambdaExecutionRole.Arn
+      
+  MyCustomLambdaExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      # Who can assume this role (lambda can)
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Action: 
+              - 'sts:AssumeRole'
+            Principal:
+              Service: 
+                - lambda.amazonaws.com
+
+      # Execution permissions: Managed policies
+      ManagedPolicyArns:
+        - "arn:aws:iam::aws:policy/CloudWatchLogsFullAccess"
+        - "arn:aws:iam::aws:policy/AmazonEC2FullAccess"
+
+Outputs:
+  MyCustomResourceTestArn:
+    Value: !GetAtt MyLambdaCustomResourceTest.Arn

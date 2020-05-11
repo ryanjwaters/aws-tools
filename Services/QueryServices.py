@@ -43,7 +43,7 @@ def extract(response):
 def lambda_handler(event, context):
 
     results = []
-    regionId = "ca-central-1"
+    regionId = "us-west-2"  #ca-central-1 (Canada), us-east-1 (Virginia), us-west-2 (Oregon)
         
     # Query AWS SSM for list of services in this region
     pathId   = "/aws/service/global-infrastructure/regions/" +regionId+ "/services"

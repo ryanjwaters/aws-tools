@@ -1,0 +1,27 @@
+Parameters:
+
+  Stage:
+    Type: String
+
+Resources:
+
+  MyDynamoDBEmailBlacklistTable: 
+    Type: AWS::DynamoDB::Table
+    Properties: 
+      #TableName: "EmailBlackTable"
+      AttributeDefinitions: 
+        - 
+          AttributeName: "EmailAddress"
+          AttributeType: "S"
+      KeySchema: 
+        - 
+          AttributeName: "EmailAddress"
+          KeyType: "HASH"
+      ProvisionedThroughput: 
+        ReadCapacityUnits: 2
+        WriteCapacityUnits: 2
+
+Outputs:
+
+  MyDBTableName:
+    Value: !Ref MyDynamoDBEmailBlacklistTable

@@ -1,0 +1,23 @@
+Parameters:
+  Stage:
+    Type: String
+
+Resources:
+
+  MyQueueEmail: 
+    Type: AWS::SQS::Queue
+    #Properties: 
+      #QueueName: "MyQueueEmail"
+  
+  MyQueueEmailBounce: 
+    Type: AWS::SQS::Queue
+    #Properties: 
+      #QueueName: "MyQueueEmailBounce"
+
+Outputs:
+
+  MyQueueEmailArn:
+    Value: !GetAtt MyQueueEmail.Arn
+
+  MyQueueEmailBounceArn:
+    Value: !GetAtt MyQueueEmailBounce.Arn
