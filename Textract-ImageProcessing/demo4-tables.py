@@ -5,7 +5,7 @@ import sys
 # Example - "python demo4-tables.py assets/table-sample.png"
 
 # Document
-s3BucketName = "ircc-textract-demo"
+s3BucketName = "ryanjwaters-textract-demo"
 documentName = str(sys.argv[1])
 
 # Amazon Textract client

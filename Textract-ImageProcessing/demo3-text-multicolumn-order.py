@@ -4,7 +4,7 @@ import sys
 # Example - "python demo3-text-multicolumn-order.py assets/two-column-image.jpg"
 
 # Document
-s3BucketName = "ircc-textract-demo"
+s3BucketName = "ryanjwaters-textract-demo"
 documentName = str(sys.argv[1])
 
 # Amazon Textract client
