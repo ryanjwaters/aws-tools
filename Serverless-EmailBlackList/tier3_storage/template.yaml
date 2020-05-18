@@ -1,5 +1,4 @@
 Parameters:
-
   Stage:
     Type: String
 
@@ -8,7 +7,7 @@ Resources:
   MyDynamoDBEmailBlacklistTable: 
     Type: AWS::DynamoDB::Table
     Properties: 
-      #TableName: "EmailBlackTable"
+      TableName: '{{resolve:ssm:DBTableName-Dev:1}}'
       AttributeDefinitions: 
         - 
           AttributeName: "EmailAddress"
@@ -20,8 +19,3 @@ Resources:
       ProvisionedThroughput: 
         ReadCapacityUnits: 2
         WriteCapacityUnits: 2
-
-Outputs:
-
-  MyDBTableName:
-    Value: !Ref MyDynamoDBEmailBlacklistTable

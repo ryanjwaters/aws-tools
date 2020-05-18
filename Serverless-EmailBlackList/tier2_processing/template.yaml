@@ -13,10 +13,6 @@ Parameters:
   MyCustomResourceTestArn:
     Type: String
     MinLength: 1  
-  
-  MyDBTableName:
-    Type: String
-    MinLength: 1
 
 Resources:
 
@@ -28,7 +24,7 @@ Resources:
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
-          databaseName: !Ref MyDBTableName
+          databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
 
   MyLambdaEmailBounce:
     Type: AWS::Lambda::Function
@@ -38,8 +34,8 @@ Resources:
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
-          databaseName: !Ref MyDBTableName
-          
+          databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
+
   MyCustomResourceTest:
     Type: "Custom::Test"
     Properties:
@@ -89,9 +85,7 @@ Resources:
       EventSourceArn: 
         !Ref MyQueueEmailArn
       FunctionName:
-        Fn::GetAtt:
-          - MyLambdaEmail
-          - Arn
+        !GetAtt MyLambdaEmail.Arn
 
   MyEventSourceMappingEmailBounce:
     Type: AWS::Lambda::EventSourceMapping
@@ -99,6 +93,4 @@ Resources:
       EventSourceArn: 
         !Ref MyQueueEmailBounceArn
       FunctionName:
-        Fn::GetAtt:
-          - MyLambdaEmailBounce
-          - Arn
+        !GetAtt MyLambdaEmailBounce.Arn
