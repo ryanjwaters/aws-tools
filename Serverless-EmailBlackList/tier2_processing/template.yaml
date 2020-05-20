@@ -24,7 +24,8 @@ Resources:
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
-          databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
+          #databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
+          databaseName: !Join ['', ['{{resolve:ssm:DBTableName-', !Ref Stage, ':1}}' ]]
 
   MyLambdaEmailBounce:
     Type: AWS::Lambda::Function
@@ -34,14 +35,8 @@ Resources:
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
-          databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
-
-  MyCustomResourceTest:
-    Type: "Custom::Test"
-    Properties:
-      #ServiceToken: "arn:aws:lambda:us-east-1:396696610383:function:lambda_customResourceTest"
-      ServiceToken: !Ref MyCustomResourceTestArn
-      ec2TagName: "RyanTest"
+          #databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
+          databaseName: !Join ['', ['{{resolve:ssm:DBTableName-', !Ref Stage, ':1}}' ]]
 
   ########################################################################################## 
   # Lambda Execution Role
@@ -64,7 +59,8 @@ Resources:
       ManagedPolicyArns:
         - "arn:aws:iam::aws:policy/service-role/AWSLambdaSQSQueueExecutionRole"
         - "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
-
+        - "arn:aws:iam::aws:policy/AmazonSESFullAccess"
+        
       # Execution permissions: Inline policy
       Policies:
         - PolicyName: my-policy-test
@@ -94,3 +90,21 @@ Resources:
         !Ref MyQueueEmailBounceArn
       FunctionName:
         !GetAtt MyLambdaEmailBounce.Arn
+
+##########################################################################################
+  MySESBounceSNSTopic:
+    Type: AWS::SNS::Topic
+    Properties:
+      Subscription:
+        - Endpoint:
+            !Ref MyQueueEmailBounceArn
+          Protocol: "sqs"
+      TopicName: "ses-bounces-topic-test"
+
+  MyCustomResourceTest:
+    Type: "Custom::Test"
+    Properties:
+      ServiceToken: !Ref MyCustomResourceTestArn
+      identity: !Join ['', ['{{resolve:ssm:VerifiedEmail-', !Ref Stage, ':1}}' ]]
+      snsTopicARN: !Ref MySESBounceSNSTopic
+    DependsOn: MySESBounceSNSTopic

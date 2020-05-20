@@ -15,10 +15,17 @@ def handler(event, context):
 
         # Retrieve data from the request (ie-get EC2 tag name to launch instance)
         request_properties = event.get('ResourceProperties', None)
-        ec2TagName = request_properties['ec2TagName'] #Example property sent in from CFM
+        identity = request_properties['identity']
+        snsTopicARN = request_properties['snsTopicARN']
 
         if event['RequestType'] == 'Create':
-            LOGGER.info('Create custom resource')
+            LOGGER.info('Create custom resource: ' +identity+ " : " +snsTopicARN)
+
+            # Create a new SES resource and specify a region.
+            client = boto3.client('ses', region_name="us-east-1")
+            client.set_identity_notification_topic(Identity=identity, NotificationType='Bounce',    SnsTopic=snsTopicARN)
+            client.set_identity_notification_topic(Identity=identity, NotificationType='Complaint', SnsTopic=snsTopicARN)
+            client.set_identity_notification_topic(Identity=identity, NotificationType='Delivery',  SnsTopic=snsTopicARN)
             send_response(event, context, "SUCCESS", { "Message": "Resource created" })
         
         elif event['RequestType'] == 'Update':
@@ -27,6 +34,12 @@ def handler(event, context):
         
         elif event['RequestType'] == 'Delete':
             LOGGER.info('Delete custom resource')
+
+            client = boto3.client('ses', region_name="us-east-1")
+            client.set_identity_notification_topic(Identity=identity, NotificationType='Bounce') #Clear out the SNS usage
+            client.set_identity_notification_topic(Identity=identity, NotificationType='Complaint')
+            client.set_identity_notification_topic(Identity=identity, NotificationType='Delivery')
+
             send_response(event, context, "SUCCESS", { "Message": "Resource deleted" })
         
         else:

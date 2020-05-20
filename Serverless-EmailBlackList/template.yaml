@@ -5,21 +5,24 @@ Parameters:
 
 Resources:
 
-  # Following is an example how to add the SSM ParamStore value via CFM
-  # This can be done outside of CFM via:
-  # aws ssm put-parameter --name "DBTableName-Dev" --type String --value "EmailBlackListTable-Dev"
-  
-  # You are not allowed to create a secure-string as this is bad practice to hard-code passwords in CFM
-  # aws ssm put-parameter --name "ServicePassword-Dev" --type SecureString --value "pass1234"
-  # Then reference it with '{{resolve:ssm-secure:ServicePassword-Dev:1}}' (11 resources take SecureString)
-
-  TestParameter:
+  SetupParamStoreDatabase:
     Type: AWS::SSM::Parameter
     Properties:
       Name: !Join [ "-", [ DBTableName, !Ref Stage ]]
       Type: String
       Value: !Join [ "-", [ EmailBlackList, !Ref Stage ]]
       Description: SSM Parameter for getting DB Table name for specific stage.
+
+  # TEST: Create a secret with the username admin and a randomly generated password in JSON.  
+  MyRDSInstanceRotationSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: 'This is the secret for my RDS instance'
+      GenerateSecretString:
+        SecretStringTemplate: '{"username": "admin"}'
+        GenerateStringKey: 'password'
+        PasswordLength: 16
+        ExcludeCharacters: '"@/\'
 
   Internal:
     Type: AWS::CloudFormation::Stack
@@ -51,4 +54,4 @@ Resources:
       TemplateURL: tier3_storage/template.yaml
       Parameters:
         Stage: !Ref Stage
-    DependsOn: TestParameter
+    DependsOn: SetupParamStoreDatabase
