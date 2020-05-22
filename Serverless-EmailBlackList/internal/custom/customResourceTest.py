@@ -13,7 +13,7 @@ def handler(event, context):
         LOGGER.info('Request received:\n %s', event)
         LOGGER.info('Response received:\n %s', context)
 
-        # Retrieve data from the request (ie-get EC2 tag name to launch instance)
+        # Retrieve data from the request
         request_properties = event.get('ResourceProperties', None)
         identity = request_properties['identity']
         snsTopicARN = request_properties['snsTopicARN']

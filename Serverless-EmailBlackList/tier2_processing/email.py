@@ -1,38 +1,48 @@
 import boto3
 import json
+import logging
 import os
 from botocore.exceptions import ClientError
 
-def sendEmail(toEmailAddress):
-    SENDER = "ryanws@amazon.com"
-    RECIPIENT = toEmailAddress,
-    CONFIGURATION_SET = "TestConfigSet"
-    AWS_REGION = "us-east-1"
-    SUBJECT = "Amazon SES Test"
-    CHARSET = "UTF-8"
-    
-    BODY_TEXT = ("Amazon SES Test \r\n"
-        "This email was sent with Amazon SES")
-            
-    BODY_HTML = """<html>
+LOGGER = logging.getLogger()
+LOGGER.setLevel(logging.INFO)
+
+CONFIGURATION_SET = "TestConfigSet"
+AWS_REGION = "us-east-1" #TODO: Is this needed, will it default to my region?
+SUBJECT = "Amazon SES Test"
+CHARSET = "UTF-8"
+
+BODY_TEXT = ("Amazon SES Test \r\n"
+    "This email was sent with Amazon SES")
+        
+BODY_HTML = """<html>
     <head></head>
     <body>
     <h1>Amazon SES Test</h1>
     <p>This email was sent with
-        <a href='https://aws.amazon.com/ses/'>Amazon SES</a></p>
+    <a href='https://aws.amazon.com/ses/'>Amazon SES</a></p>
     </body>
     </html>
-    """            
-    
-    # Create a new SES resource and specify a region.
-    client = boto3.client('ses', region_name=AWS_REGION)
+    """   
 
-    # Try to send the email.
+def sendEmail(toEmailAddress):
+
     try:
+        toEmailAddresses = []
+        toEmailAddresses.append(toEmailAddress)
+        
+        # Get the from email address (from param store)
+        ssm = boto3.client('ssm')
+        parameter = ssm.get_parameter(Name='VerifiedEmail-Dev') #TODO: Read 'dev' as env variable
+        fromEmailAddress = parameter['Parameter']['Value']
+        
+        # Create a new SES resource and specify a region.
+        client = boto3.client('ses', region_name=AWS_REGION)
+        
         #Provide the contents of the email.
         response = client.send_email(
             Destination={
-                'ToAddresses': RECIPIENT,
+                'ToAddresses': toEmailAddresses,
             },
             Message={
                 'Body': {
@@ -50,14 +60,14 @@ def sendEmail(toEmailAddress):
                     'Data': SUBJECT,
                 },
             },
-            Source=SENDER
+            Source=fromEmailAddress
             #ConfigurationSetName=CONFIGURATION_SET
         )
     except ClientError as e:
-        print(e.response['Error']['Message'])
+        LOGGER.info(e.response['Error']['Message'])
     else:
-        print("Email sent.  Message ID: "),
-        print(response['MessageId'])
+        LOGGER.info("Email sent.  Message ID: "),
+        LOGGER.info(response['MessageId'])
 
 def handler(event, context):
     dynamoDBTable = os.environ['databaseName']
@@ -71,13 +81,13 @@ def handler(event, context):
         Key       = { 'EmailAddress' : { 'S' : emailAddress } },
         ReturnConsumedCapacity='TOTAL'
     )
-    print(result)
+    LOGGER.info(result)
 
     # Check if the emailAddress is in the black list
     if 'Item' in result:
         item = result['Item']
-        print("Email is in the blacklist, cannot send")
-        print(item)
+        LOGGER.info("Email is in the blacklist, cannot send")
+        LOGGER.info(item)
     else:
-        print("Email is NOT in the blacklist, ok to send")
+        LOGGER.info("Email is NOT in the blacklist, ok to send")
         sendEmail(emailAddress)
