@@ -10,6 +10,10 @@ Parameters:
     Type: String
     MinLength: 1
 
+  MySNSTopicEmailBounceArn:
+    Type: String
+    MinLength: 1
+
   MyCustomResourceTestArn:
     Type: String
     MinLength: 1  
@@ -93,19 +97,10 @@ Resources:
         !GetAtt MyLambdaEmailBounce.Arn
 
 ##########################################################################################
-  MySESBounceSNSTopic:
-    Type: AWS::SNS::Topic
-    Properties:
-      Subscription:
-        - Endpoint:
-            !Ref MyQueueEmailBounceArn
-          Protocol: "sqs"
-      TopicName: "ses-bounces-topic-test"
 
   MyCustomResourceTest:
     Type: "Custom::Test"
     Properties:
       ServiceToken: !Ref MyCustomResourceTestArn
       identity: !Join ['', ['{{resolve:ssm:VerifiedEmail-', !Ref Stage, ':1}}' ]]
-      snsTopicARN: !Ref MySESBounceSNSTopic
-    DependsOn: MySESBounceSNSTopic
+      snsTopicARN: !Ref MySNSTopicEmailBounceArn

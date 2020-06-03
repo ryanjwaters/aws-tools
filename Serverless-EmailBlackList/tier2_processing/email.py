@@ -31,9 +31,9 @@ def sendEmail(toEmailAddress):
         toEmailAddresses = []
         toEmailAddresses.append(toEmailAddress)
         
-        # Get the from email address (from param store)
+        # Get the "From" email address (from param store)
         ssm = boto3.client('ssm')
-        parameter = ssm.get_parameter(Name='VerifiedEmail-Dev') #TODO: Read 'dev' as env variable
+        parameter = ssm.get_parameter(Name='VerifiedEmail-Dev') #TODO: Read 'dev' stage as env variable?
         fromEmailAddress = parameter['Parameter']['Value']
         
         # Create a new SES resource and specify a region.

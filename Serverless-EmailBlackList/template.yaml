@@ -46,8 +46,9 @@ Resources:
         Stage: !Ref Stage
         MyQueueEmailArn: !GetAtt Tier1API.Outputs.MyQueueEmailArn
         MyQueueEmailBounceArn: !GetAtt Tier1API.Outputs.MyQueueEmailBounceArn
+        MySNSTopicEmailBounceArn: !GetAtt Tier1API.Outputs.MySNSTopicEmailBounceArn
         MyCustomResourceTestArn: !GetAtt Internal.Outputs.MyCustomResourceTestArn
-
+        
   Tier3Storage:
     Type: AWS::CloudFormation::Stack
     Properties:
