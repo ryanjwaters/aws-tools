@@ -17,12 +17,12 @@ Before creating the Stack with the provided CloudFormation template you need to:
 2.2 Use Cloudformation
 
     aws cloudformation package  \
-        --template-file template.yaml \
+        --template-file template_cfm.yaml \
         --s3-bucket ryanjwaters \
-        --output-template-file template.packaged.yml
+        --output-template-file template_cfm.packaged.yml
 
     aws cloudformation deploy \
-        --template-file template.packaged.yml \
+        --template-file template_cfm.packaged.yml \
         --stack-name serverlessDemo \
         --capabilities CAPABILITY_NAMED_IAM \
         --parameter-overrides Stage=Dev
