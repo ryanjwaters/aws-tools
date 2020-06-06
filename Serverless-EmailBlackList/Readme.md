@@ -19,7 +19,9 @@ Before creating the Stack with the provided CloudFormation template you need to:
         --template-file template.yaml \
         --s3-bucket ryanjwaters \
         --output-template-file template.packaged.yml
-
+    ```
+    
+    ```
     aws cloudformation deploy \
         --template-file template.packaged.yml \
         --stack-name serverlessDemo \
