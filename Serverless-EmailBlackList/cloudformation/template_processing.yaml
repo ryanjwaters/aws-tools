@@ -24,23 +24,23 @@ Resources:
     Type: AWS::Lambda::Function
     Properties:
       Handler: email.handler
+      Code: ../src/
       Runtime: python3.7
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
-          #databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
-          databaseName: !Join ['', ['{{resolve:ssm:DBTableName-', !Ref Stage, ':1}}' ]]
+          databaseName: !Join ['', ['BlackListTable-', !Ref Stage ]]
 
   MyLambdaEmailBounce:
     Type: AWS::Lambda::Function
     Properties:
       Handler: emailBounce.handler
+      Code: ../src/
       Runtime: python3.7
       Role: !GetAtt MyLambdaExecutionRole.Arn
       Environment:
         Variables:
-          #databaseName: '{{resolve:ssm:DBTableName-Dev:1}}'
-          databaseName: !Join ['', ['{{resolve:ssm:DBTableName-', !Ref Stage, ':1}}' ]]
+          databaseName: !Join ['', ['BlackListTable-', !Ref Stage ]]
 
   ########################################################################################## 
   # Lambda Execution Role

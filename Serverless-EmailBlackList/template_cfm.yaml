@@ -1,0 +1,39 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Parameters:
+  Stage:
+    Type: String
+
+Resources:
+
+  Internal:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: cloudformation/internal/custom/template.yaml
+      Parameters:
+        Stage: !Ref Stage
+
+  API:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: cloudformation/template_api.yaml
+      Parameters:
+        Stage: !Ref Stage
+
+  Processing:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: cloudformation/template_processing.yaml
+      Parameters:
+        Stage: !Ref Stage
+        MyQueueEmailArn: !GetAtt API.Outputs.MyQueueEmailArn
+        MyQueueEmailBounceArn: !GetAtt API.Outputs.MyQueueEmailBounceArn
+        MySNSTopicEmailBounceArn: !GetAtt API.Outputs.MySNSTopicEmailBounceArn
+        MyCustomResourceTestArn: !GetAtt Internal.Outputs.MyCustomResourceTestArn
+        
+  Storage:
+    Type: AWS::CloudFormation::Stack
+    Properties:
+      TemplateURL: cloudformation/template_storage.yaml
+      Parameters:
+        Stage: !Ref Stage

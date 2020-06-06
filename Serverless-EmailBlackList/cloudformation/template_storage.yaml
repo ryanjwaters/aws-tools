@@ -7,7 +7,7 @@ Resources:
   MyDynamoDBEmailBlacklistTable: 
     Type: AWS::DynamoDB::Table
     Properties: 
-      TableName: '{{resolve:ssm:DBTableName-Dev:1}}'
+      TableName: !Join ['', ['BlackListTable-', !Ref Stage ]]
       AttributeDefinitions: 
         - 
           AttributeName: "EmailAddress"
