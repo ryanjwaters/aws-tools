@@ -1,4 +1,4 @@
-package waters.ryan.test.sample.auth;
+package util.auth;
 
 import java.net.URL;
 import java.security.MessageDigest;
@@ -15,8 +15,8 @@ import java.util.TreeMap;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
-import waters.ryan.sample.util.BinaryUtils;
-import waters.ryan.sample.util.HttpUtils;
+import util.BinaryUtils;
+import util.HttpUtils;
 
 
 /**

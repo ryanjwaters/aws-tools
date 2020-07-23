@@ -1,10 +1,10 @@
-package waters.ryan.test.sample.auth;
+package util.auth;
 
 import java.net.URL;
 import java.util.Date;
 import java.util.Map;
 
-import waters.ryan.sample.util.BinaryUtils;
+import util.BinaryUtils;
 
 /**
  * Sample AWS4 signer demonstrating how to sign 'chunked' uploads

@@ -1,14 +1,14 @@
-package waters.ryan.sample.httpapi;
+package api;
 
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import waters.ryan.sample.util.BinaryUtils;
-import waters.ryan.sample.util.HttpUtils;
-import waters.ryan.test.sample.auth.AWS4SignerBase;
-import waters.ryan.test.sample.auth.AWS4SignerForAuthorizationHeader;
+import util.BinaryUtils;
+import util.HttpUtils;
+import util.auth.AWS4SignerBase;
+import util.auth.AWS4SignerForAuthorizationHeader;
 
 public class CostExplorerCostAndUsage 
 {

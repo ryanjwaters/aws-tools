@@ -1,4 +1,5 @@
-package waters.ryan.sample.httpapi;
+import api.GetS3ObjectSample;
+import api.PutS3ObjectSample;
 
 public class Main 
 {

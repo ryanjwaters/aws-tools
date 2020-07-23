@@ -1,4 +1,4 @@
-package waters.ryan.sample.util;
+package util;
 
 import java.util.Locale;
 
