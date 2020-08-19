@@ -32,6 +32,7 @@ def extract(response):
     for result in results:
         my_result =  {}
         my_result['Name'] = result['Name']
+        my_result['id']   = result['Value']
         my_result['ARN']  = result['ARN']
 
         # Need to do a query for each service to get more details (Full name, URL, etc)
@@ -43,7 +44,7 @@ def extract(response):
 def lambda_handler(event, context):
 
     results = []
-    regionId = "us-west-2"  #ca-central-1 (Canada), us-east-1 (Virginia), us-west-2 (Oregon)
+    regionId = "ca-central-1"  #ca-central-1 (Canada), us-east-1 (Virginia), us-west-2 (Oregon)
         
     # Query AWS SSM for list of services in this region
     pathId   = "/aws/service/global-infrastructure/regions/" +regionId+ "/services"
@@ -65,8 +66,8 @@ def lambda_handler(event, context):
         if 'marketingHomeURL' in service:
             myURL = format(service['marketingHomeURL'])
 
-        row = "{:>4}.{:<60}{:<60}"  # build formatter string
-        print(row.format(i, service['longName'], myURL))
+        row = "{:>4}.{:<35}{:<60}{:<60}"  # build formatter string
+        print(row.format(i, service['id'], service['longName'], myURL))
  
         i+=1
 
